@@ -8,6 +8,11 @@ import {nanoid} from 'nanoid';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import cloudinary from 'cloudinary'; 
+import helmet from 'helmet';
+import mongoSanitize from 'express-mongo-sanitize'
+
+
+
 // Routes 
 
 import jobRouter from './routes/jobRouter.js'
@@ -42,9 +47,11 @@ const app = express();
 app.use(express.json());
 // To use the Cookie Parser 
 app.use(cookieParser());
+app.use(helmet());
+app.use(mongoSanitize());
 
 // 
-app.use(express.static(path.resolve(__dirname,'./public')))
+app.use(express.static(path.resolve(__dirname,'./client/dist')))
 
 
 
@@ -54,9 +61,9 @@ if(process.env.NODE_ENV ==='development')
 
 }
 
-app.get('/',(req,res)=>{
-    res.send("Hello World");
-});
+// app.get('/',(req,res)=>{
+//     res.send("Hello World");
+// });
 
 app.post('/',(req,res)=>{
     console.log(req);
@@ -78,7 +85,7 @@ app.use('/api/v1/users',authenticateUser,userRouter)
 
 
 app.get('*',(req,res)=>{
-    res.sendFile(path.resolve(__dirname,'./public','index.html'))
+    res.sendFile(path.resolve(__dirname,'./client/dist','index.html'))
 })
 // // GET ALL JOBS 
 

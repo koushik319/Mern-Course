@@ -1,4 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {HomeLayout,Login,DashboardLayout,Register,Error,Landing,AddJob,Stats,Profile,AllJobs,Admin,EditJob} from './Pages';
 import {action as registerAction} from './Pages/Register.jsx';
 import {action as loginAction} from './Pages/Login.jsx';
@@ -11,6 +13,8 @@ import {action as deleteJobAction} from './Pages/DeleteJob.jsx'
 import {loader as adminLoader} from './Pages/Admin.jsx'
 import {action as profileAction} from './Pages/Profile.jsx'
 import {loader as statsLoader} from './Pages/Stats.jsx'
+import ErrorElement from "./components/ErrorElement.jsx";
+
 export const checkDefaultTheme = () => {
   const isDarkTheme =
     localStorage.getItem('darkTheme') === 'true'
@@ -20,6 +24,13 @@ export const checkDefaultTheme = () => {
 
 checkDefaultTheme();
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+    },
+  },
+});
 
  const router= createBrowserRouter([
   {
@@ -54,7 +65,8 @@ checkDefaultTheme();
           {
             path: 'stats',
             element: <Stats/>,
-            loader : statsLoader,
+            loader : statsLoader(queryClient),
+            errorElement : <ErrorElement/>,
           },
           {
             path: 'profile',
@@ -91,14 +103,13 @@ checkDefaultTheme();
   }
 ]);
 
-const App= ()=>{
-    return(
-      <div> 
-      
-       <RouterProvider router={router}/>
-      </div>
-     
-    )
-}
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
+};
 
 export default App;
